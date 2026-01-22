@@ -245,7 +245,7 @@ def play_audio(text, filename_base=None):
     except:
         st.caption("🔇")
 
-# --- 2. 隨機出題邏輯 ---
+# --- 2. 隨機出題邏輯 (加入強制重置功能) ---
 def init_quiz():
     st.session_state.score = 0
     st.session_state.current_q = 0
@@ -269,6 +269,14 @@ def init_quiz():
     random.shuffle(q3_options)
     st.session_state.q3_data = {"target": q3_target, "options": q3_options}
 
+# 檢查數據是否過期 (如果沒有 emoji 就重置)
+if 'q1_data' in st.session_state:
+    try:
+        # 嘗試讀取一個 emoji，如果失敗就重置
+        _ = st.session_state.q1_data['target']['emoji']
+    except KeyError:
+        init_quiz() # 發現舊資料，強制重置
+
 if 'q1_data' not in st.session_state:
     init_quiz()
 
@@ -284,11 +292,14 @@ def show_learning_mode():
             display_text = item['amis']
             if item['amis'] == "kasuvucan":
                 display_text += "<br><span style='font-size:10px'>(kasubucan)</span>"
+            
+            # 安全讀取 emoji
+            emoji_icon = item.get('emoji', '🌟')
                 
             st.markdown(f"""
             <div class="word-card">
                 <div class="card-top"></div>
-                <div class="icon-box">{item['emoji']}</div>
+                <div class="icon-box">{emoji_icon}</div>
                 <div class="amis-word">{display_text}</div>
                 <div class="zh-word">{item['zh']}</div>
             </div>
@@ -301,9 +312,10 @@ def show_learning_mode():
     
     # 句子區
     for s in SENTENCES:
+        emoji_icon = s.get('emoji', '💬')
         st.markdown(f"""
         <div class="chat-box">
-            <div class="chat-icon">{s['emoji']}</div>
+            <div class="chat-icon">{emoji_icon}</div>
             <div class="chat-content">
                 <div class="chat-amis">{s['amis']}</div>
                 <div class="chat-zh">{s['zh']}</div>
@@ -334,7 +346,9 @@ def show_quiz_mode():
         cols = st.columns(3)
         for idx, opt in enumerate(data['options']):
             with cols[idx]:
-                if st.button(f"{opt['emoji']} {opt['zh']}", key=f"q1_{idx}"):
+                # 這裡加上 .get() 防呆，避免 KeyError
+                emoji_icon = opt.get('emoji', '❓')
+                if st.button(f"{emoji_icon} {opt['zh']}", key=f"q1_{idx}"):
                     if opt['amis'] == target['amis']:
                         st.balloons()
                         st.success("Bingo! 答對了！")
