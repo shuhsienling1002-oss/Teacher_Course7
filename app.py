@@ -368,7 +368,7 @@ def main():
     <div class="header-box">
         <h1>Kapah haw kisu?</h1>
         <div style="font-size: 1.2rem; margin-top:5px;">你好嗎？</div>
-        <div class="sub-info">講師：楊麗芳 | 教材提供者：楊麗芳</div>
+        <div class="sub-info">講師：胡美芳 | 教材提供者：胡美芳</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -382,3 +382,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
