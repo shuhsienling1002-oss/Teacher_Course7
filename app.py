@@ -193,7 +193,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 1. 資料與圖示設定 (重點：加上 Emoji) ---
+# --- 1. 資料與圖示設定 ---
 
 VOCABULARY = [
     {"amis": "kapah",       "zh": "好",           "emoji": "👍", "file": "v_kapah"},
@@ -245,7 +245,7 @@ def play_audio(text, filename_base=None):
     except:
         st.caption("🔇")
 
-# --- 2. 隨機出題邏輯 (加入強制重置功能) ---
+# --- 2. 隨機出題邏輯 (含防呆) ---
 def init_quiz():
     st.session_state.score = 0
     st.session_state.current_q = 0
@@ -272,10 +272,9 @@ def init_quiz():
 # 檢查數據是否過期 (如果沒有 emoji 就重置)
 if 'q1_data' in st.session_state:
     try:
-        # 嘗試讀取一個 emoji，如果失敗就重置
         _ = st.session_state.q1_data['target']['emoji']
     except KeyError:
-        init_quiz() # 發現舊資料，強制重置
+        init_quiz() 
 
 if 'q1_data' not in st.session_state:
     init_quiz()
@@ -285,7 +284,6 @@ if 'q1_data' not in st.session_state:
 def show_learning_mode():
     st.markdown("<h3 style='color:#5D4037; text-align:center; margin-bottom:20px;'>🌈 圖解單字卡</h3>", unsafe_allow_html=True)
     
-    # 單字區：使用 3 欄位排版，讓卡片更緊湊可愛
     cols = st.columns(3)
     for idx, item in enumerate(VOCABULARY):
         with cols[idx % 3]:
@@ -293,7 +291,6 @@ def show_learning_mode():
             if item['amis'] == "kasuvucan":
                 display_text += "<br><span style='font-size:10px'>(kasubucan)</span>"
             
-            # 安全讀取 emoji
             emoji_icon = item.get('emoji', '🌟')
                 
             st.markdown(f"""
@@ -305,12 +302,11 @@ def show_learning_mode():
             </div>
             """, unsafe_allow_html=True)
             play_audio(item['amis'], filename_base=item['file'])
-            st.write("") # 間距
+            st.write("") 
     
     st.markdown("---")
     st.markdown("<h3 style='color:#5D4037; text-align:center; margin-bottom:20px;'>💬 聊天練習</h3>", unsafe_allow_html=True)
     
-    # 句子區
     for s in SENTENCES:
         emoji_icon = s.get('emoji', '💬')
         st.markdown(f"""
@@ -346,7 +342,6 @@ def show_quiz_mode():
         cols = st.columns(3)
         for idx, opt in enumerate(data['options']):
             with cols[idx]:
-                # 這裡加上 .get() 防呆，避免 KeyError
                 emoji_icon = opt.get('emoji', '❓')
                 if st.button(f"{emoji_icon} {opt['zh']}", key=f"q1_{idx}"):
                     if opt['amis'] == target['amis']:
@@ -422,11 +417,12 @@ def show_quiz_mode():
             init_quiz()
             st.rerun()
 
-# --- 4. 主程式 ---
+# --- 4. 主程式 (只修改這裡：加上了 👋 圖示) ---
 def main():
     # Header
     st.markdown("""
     <div class="header-container">
+        <div style="font-size: 80px; margin-bottom: 10px;">👋</div>
         <h1 class="main-title">Kapah haw kisu?</h1>
         <div class="sub-title">你好嗎？</div>
         <div class="teacher-tag">
